@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nimbus - Modern Weather and Air Quality Dashboard optimized for Indian Metros featuring live AQI index, health alerts, and monsoon/heatwave advisories.">
+    <title>Nimbus - Weather & Air Quality Dashboard</title>
+    
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="weather-clear-day">
+    <!-- Dynamic weather particle effects background -->
+    <div id="weather-particles" class="weather-particles"></div>
+    
+    <!-- Main App Container -->
+    <div class="app-container">
+        
+        <!-- Sidebar: Saved / Favorite Cities -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i data-lucide="star" class="icon-star"></i> Favorites (India)</h2>
+                <button id="close-sidebar" class="btn-icon mobile-only" aria-label="Close sidebar">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="favorites-list" id="favorites-list">
+                <!-- Dynamically populated favorite cities -->
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Top Navigation / Search Bar -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button id="toggle-sidebar" class="btn-icon" aria-label="Toggle favorites panel">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="brand">
+                        <i data-lucide="cloud-lightning" class="brand-icon"></i>
+                        <h1>Nimbus</h1>
+                    </div>
+                </div>
+                
+                <!-- Search container with autocomplete -->
+                <div class="search-container">
+                    <div class="search-bar">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="search-input" placeholder="Search Indian cities (e.g. New Delhi, Mumbai)..." autocomplete="off">
+                        <button id="geolocate-btn" class="btn-icon" title="Use current location">
+                            <i data-lucide="map-pin"></i>
+                        </button>
+                    </div>
+                    <div class="search-dropdown" id="search-dropdown" hidden>
+                        <!-- Dynamic geocoding results -->
+                    </div>
+                </div>
+                
+                <!-- Controls: Unit switcher & Favorite toggle -->
+                <div class="header-controls">
+                    <button id="fav-current-btn" class="btn-icon btn-fav-toggle" title="Add current city to favorites">
+                        <i data-lucide="star"></i>
+                    </button>
+                    <div class="unit-toggle-wrapper">
+                        <span class="unit-label">°C</span>
+                        <label class="switch">
+                            <input type="checkbox" id="unit-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="unit-label">°F</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Loading State -->
+            <div id="loader" class="loader-container">
+                <div class="spinner"></div>
+                <p>Fetching local weather & air quality...</p>
+            </div>
+
+            <!-- Weather Dashboard Grid -->
+            <div class="dashboard-grid" id="dashboard-grid" hidden>
+                
+                <!-- Severe Alert / Weather Advisory Banner (Dynamic Alert Level) -->
+                <div class="card advisory-card" id="advisory-card">
+                    <div class="advisory-icon-wrapper">
+                        <i data-lucide="alert-triangle" id="advisory-icon"></i>
+                    </div>
+                    <div class="advisory-content">
+                        <h3 id="advisory-title">Weather Advisory</h3>
+                        <p id="advisory-desc">Stay indoors or carry precautions according to active local health advisories.</p>
+                    </div>
+                </div>
+
+                <!-- Current Weather Spotlight -->
+                <section class="card current-weather-card">
+                    <div class="current-main">
+                        <div class="location-details">
+                            <h2 id="current-city">New Delhi</h2>
+                            <p id="current-country">India</p>
+                            <span id="current-time">Sunday, 12:00 PM</span>
+                        </div>
+                        <div class="temp-display">
+                            <span class="temp-value" id="current-temp">32</span>
+                            <span class="temp-unit">°C</span>
+                        </div>
+                    </div>
+                    <div class="current-status">
+                        <div class="status-visual">
+                            <i data-lucide="sun" id="weather-large-icon" class="weather-large-icon anim-spin"></i>
+                        </div>
+                        <div class="status-desc">
+                            <h3 id="weather-description">Clear Sky</h3>
+                            <p id="temp-range">H: 38° L: 26°</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Air Quality Index (AQI) Widget -->
+                <section class="card aqi-card">
+                    <div class="card-header">
+                        <h3><i data-lucide="wind" class="card-title-icon"></i> Air Quality Index (AQI)</h3>
+                        <span id="aqi-badge" class="aqi-badge status-good">Good</span>
+                    </div>
+                    <div class="aqi-body">
+                        <div class="aqi-main-value">
+                            <span id="val-aqi">35</span>
+                            <span class="aqi-label">US AQI</span>
+                        </div>
+                        <div class="aqi-pollutants">
+                            <div class="pollutant-item">
+                                <span class="pollutant-name">PM<sub>2.5</sub></span>
+                                <span class="pollutant-val" id="val-pm25">8.4 µg/m³</span>
+                            </div>
+                            <div class="pollutant-item">
+                                <span class="pollutant-name">PM<sub>10</sub></span>
+                                <span class="pollutant-val" id="val-pm10">18.1 µg/m³</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aqi-health-msg">
+                        <p id="aqi-health-desc">Air quality is satisfactory, and air pollution poses little or no risk.</p>
+                    </div>
+                </section>
+
+                <!-- 7-Day Forecast Grid Card -->
+                <section class="card weekly-forecast-card">
+                    <div class="card-header">
+                        <h3><i data-lucide="calendar" class="card-title-icon"></i> 7-Day Forecast</h3>
+                    </div>
+                    <div class="weekly-list" id="weekly-forecast-list">
+                        <!-- Dynamically populated daily list items -->
+                    </div>
+                </section>
+
+                <!-- Weather Details (Grid of mini metrics) -->
+                <section class="metrics-grid">
+                    <!-- Feels Like -->
+                    <div class="metric-item card">
+                        <div class="metric-header">
+                            <i data-lucide="thermometer"></i>
+                            <h4>Feels Like</h4>
+                        </div>
+                        <div class="metric-value"><span id="val-feels-like">38</span>°</div>
+                        <p class="metric-footer" id="desc-feels-like">High heat index felt today.</p>
+                    </div>
+                    <!-- Wind -->
+                    <div class="metric-item card">
+                        <div class="metric-header">
+                            <i data-lucide="wind"></i>
+                            <h4>Wind Speed</h4>
+                        </div>
+                        <div class="metric-value"><span id="val-wind">14</span> <span class="metric-unit-lbl">km/h</span></div>
+                        <p class="metric-footer" id="desc-wind">Direction: WSW</p>
+                    </div>
+                    <!-- Humidity -->
+                    <div class="metric-item card">
+                        <div class="metric-header">
+                            <i data-lucide="droplets"></i>
+                            <h4>Humidity</h4>
+                        </div>
+                        <div class="metric-value"><span id="val-humidity">64</span>%</div>
+                        <p class="metric-footer" id="desc-humidity">Dew point is highly humid.</p>
+                    </div>
+                    <!-- UV Index -->
+                    <div class="metric-item card">
+                        <div class="metric-header">
+                            <i data-lucide="sun"></i>
+                            <h4>UV Index</h4>
+                        </div>
+                        <div class="metric-value"><span id="val-uv">9</span></div>
+                        <p class="metric-footer" id="desc-uv">Very high UV exposure hazard.</p>
+                    </div>
+                    <!-- Pressure -->
+                    <div class="metric-item card">
+                        <div class="metric-header">
+                            <i data-lucide="gauge"></i>
+                            <h4>Pressure</h4>
+                        </div>
+                        <div class="metric-value"><span id="val-pressure">1005</span> <span class="metric-unit-lbl">hPa</span></div>
+                        <p class="metric-footer" id="desc-pressure">Low pressure monsoon trough.</p>
+                    </div>
+                    <!-- Precipitation probability -->
+                    <div class="metric-item card">
+                        <div class="metric-header">
+                            <i data-lucide="cloud-rain"></i>
+                            <h4>Rain probability</h4>
+                        </div>
+                        <div class="metric-value"><span id="val-precip">80</span>%</div>
+                        <p class="metric-footer" id="desc-precip">High chance of localized monsoon showers.</p>
+                    </div>
+                </section>
+
+                <!-- Sun Path Visualizer Card -->
+                <section class="card sun-path-card">
+                    <div class="card-header">
+                        <h3><i data-lucide="sunset" class="card-title-icon"></i> Sun Position</h3>
+                    </div>
+                    <div class="sun-path-container">
+                        <div class="sun-arc-wrapper">
+                            <svg class="sun-arc-svg" viewBox="0 0 100 50">
+                                <path d="M 10 45 A 40 40 0 0 1 90 45" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2" stroke-dasharray="3, 3" />
+                                <path id="sun-arc-progress" d="M 10 45 A 40 40 0 0 1 90 45" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-dasharray="125" stroke-dashoffset="125" />
+                            </svg>
+                            <div class="sun-element" id="sun-element">
+                                <i data-lucide="sun"></i>
+                            </div>
+                        </div>
+                        <div class="sun-timeline">
+                            <div class="time-marker">
+                                <span class="marker-label">Sunrise</span>
+                                <span class="marker-val" id="val-sunrise">05:24 AM</span>
+                            </div>
+                            <div class="time-marker">
+                                <span class="marker-label">Sunset</span>
+                                <span class="marker-val" id="val-sunset">07:15 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Hourly Forecast (Horizontal slider) -->
+                <section class="card hourly-forecast-card">
+                    <div class="card-header">
+                        <h3><i data-lucide="clock" class="card-title-icon"></i> Hourly Forecast (24 Hours)</h3>
+                    </div>
+                    <div class="hourly-slider-outer">
+                        <div class="hourly-slider" id="hourly-forecast-slider">
+                            <!-- Dynamically populated hourly entries -->
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Script -->
+    <script src="app.js"></script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Nimbus - Modern Weather and Air Quality Dashboard optimized for Indian Metros featuring live AQI index, health alerts, and monsoon/heatwave advisories.">
-    <title>Nimbus - Weather & Air Quality Dashboard</title>
+    <meta name="description" content="Nimbus - Premium Weather & Air Quality Dashboard featuring client-side AI Weather Assistant and dynamic local advisories.">
+    <title>Nimbus - AI Weather & Air Quality Dashboard</title>
     
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +27,7 @@
         <!-- Sidebar: Saved / Favorite Cities -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2><i data-lucide="star" class="icon-star"></i> Favorites (India)</h2>
+                <h2><i data-lucide="star" class="icon-star"></i> Favorites</h2>
                 <button id="close-sidebar" class="btn-icon mobile-only" aria-label="Close sidebar">
                     <i data-lucide="x"></i>
                 </button>
@@ -56,7 +56,7 @@
                 <div class="search-container">
                     <div class="search-bar">
                         <i data-lucide="search" class="search-icon"></i>
-                        <input type="text" id="search-input" placeholder="Search Indian cities (e.g. New Delhi, Mumbai)..." autocomplete="off">
+                        <input type="text" id="search-input" placeholder="Search cities (e.g. New Delhi, Paris)..." autocomplete="off">
                         <button id="geolocate-btn" class="btn-icon" title="Use current location">
                             <i data-lucide="map-pin"></i>
                         </button>
@@ -85,20 +85,23 @@
             <!-- Loading State -->
             <div id="loader" class="loader-container">
                 <div class="spinner"></div>
-                <p>Fetching local weather & air quality...</p>
+                <p>Initializing AI Models & Weather Data...</p>
             </div>
 
             <!-- Weather Dashboard Grid -->
             <div class="dashboard-grid" id="dashboard-grid" hidden>
                 
-                <!-- Severe Alert / Weather Advisory Banner (Dynamic Alert Level) -->
-                <div class="card advisory-card" id="advisory-card">
-                    <div class="advisory-icon-wrapper">
-                        <i data-lucide="alert-triangle" id="advisory-icon"></i>
+                <!-- AI Synopsis Card (Combines summary, alerts & active tips) -->
+                <div class="card ai-synopsis-card" id="ai-synopsis-card">
+                    <div class="ai-synopsis-header">
+                        <div class="ai-status">
+                            <span class="ai-status-dot"></span>
+                            <h3>Nimbus AI Weather Synopsis</h3>
+                        </div>
+                        <span id="advisory-badge" class="advisory-badge adv-blue">Normal</span>
                     </div>
-                    <div class="advisory-content">
-                        <h3 id="advisory-title">Weather Advisory</h3>
-                        <p id="advisory-desc">Stay indoors or carry precautions according to active local health advisories.</p>
+                    <div class="ai-synopsis-body">
+                        <p id="ai-summary-text">Analyzing atmospheric data for local recommendations...</p>
                     </div>
                 </div>
 
@@ -106,12 +109,12 @@
                 <section class="card current-weather-card">
                     <div class="current-main">
                         <div class="location-details">
-                            <h2 id="current-city">New Delhi</h2>
-                            <p id="current-country">India</p>
+                            <h2 id="current-city">London</h2>
+                            <p id="current-country">United Kingdom</p>
                             <span id="current-time">Sunday, 12:00 PM</span>
                         </div>
                         <div class="temp-display">
-                            <span class="temp-value" id="current-temp">32</span>
+                            <span class="temp-value" id="current-temp">21</span>
                             <span class="temp-unit">°C</span>
                         </div>
                     </div>
@@ -120,8 +123,8 @@
                             <i data-lucide="sun" id="weather-large-icon" class="weather-large-icon anim-spin"></i>
                         </div>
                         <div class="status-desc">
-                            <h3 id="weather-description">Clear Sky</h3>
-                            <p id="temp-range">H: 38° L: 26°</p>
+                            <h3 id="weather-description">Mostly Sunny</h3>
+                            <p id="temp-range">H: 24° L: 14°</p>
                         </div>
                     </div>
                 </section>
@@ -129,7 +132,7 @@
                 <!-- Air Quality Index (AQI) Widget -->
                 <section class="card aqi-card">
                     <div class="card-header">
-                        <h3><i data-lucide="wind" class="card-title-icon"></i> Air Quality Index (AQI)</h3>
+                        <h3><i data-lucide="wind" class="card-title-icon"></i> Air Quality Index</h3>
                         <span id="aqi-badge" class="aqi-badge status-good">Good</span>
                     </div>
                     <div class="aqi-body">
@@ -171,8 +174,8 @@
                             <i data-lucide="thermometer"></i>
                             <h4>Feels Like</h4>
                         </div>
-                        <div class="metric-value"><span id="val-feels-like">38</span>°</div>
-                        <p class="metric-footer" id="desc-feels-like">High heat index felt today.</p>
+                        <div class="metric-value"><span id="val-feels-like">22</span>°</div>
+                        <p class="metric-footer" id="desc-feels-like">Similar to the actual temperature.</p>
                     </div>
                     <!-- Wind -->
                     <div class="metric-item card">
@@ -180,7 +183,7 @@
                             <i data-lucide="wind"></i>
                             <h4>Wind Speed</h4>
                         </div>
-                        <div class="metric-value"><span id="val-wind">14</span> <span class="metric-unit-lbl">km/h</span></div>
+                        <div class="metric-value"><span id="val-wind">12</span> <span class="metric-unit-lbl">km/h</span></div>
                         <p class="metric-footer" id="desc-wind">Direction: WSW</p>
                     </div>
                     <!-- Humidity -->
@@ -190,7 +193,7 @@
                             <h4>Humidity</h4>
                         </div>
                         <div class="metric-value"><span id="val-humidity">64</span>%</div>
-                        <p class="metric-footer" id="desc-humidity">Dew point is highly humid.</p>
+                        <p class="metric-footer" id="desc-humidity">Comfortable level of relative humidity.</p>
                     </div>
                     <!-- UV Index -->
                     <div class="metric-item card">
@@ -198,8 +201,8 @@
                             <i data-lucide="sun"></i>
                             <h4>UV Index</h4>
                         </div>
-                        <div class="metric-value"><span id="val-uv">9</span></div>
-                        <p class="metric-footer" id="desc-uv">Very high UV exposure hazard.</p>
+                        <div class="metric-value"><span id="val-uv">4</span></div>
+                        <p class="metric-footer" id="desc-uv">Moderate level of UV radiation.</p>
                     </div>
                     <!-- Pressure -->
                     <div class="metric-item card">
@@ -207,8 +210,8 @@
                             <i data-lucide="gauge"></i>
                             <h4>Pressure</h4>
                         </div>
-                        <div class="metric-value"><span id="val-pressure">1005</span> <span class="metric-unit-lbl">hPa</span></div>
-                        <p class="metric-footer" id="desc-pressure">Low pressure monsoon trough.</p>
+                        <div class="metric-value"><span id="val-pressure">1013</span> <span class="metric-unit-lbl">hPa</span></div>
+                        <p class="metric-footer" id="desc-pressure">Normal atmospheric pressure.</p>
                     </div>
                     <!-- Precipitation probability -->
                     <div class="metric-item card">
@@ -216,8 +219,8 @@
                             <i data-lucide="cloud-rain"></i>
                             <h4>Rain probability</h4>
                         </div>
-                        <div class="metric-value"><span id="val-precip">80</span>%</div>
-                        <p class="metric-footer" id="desc-precip">High chance of localized monsoon showers.</p>
+                        <div class="metric-value"><span id="val-precip">10</span>%</div>
+                        <p class="metric-footer" id="desc-precip">Low risk of rain today.</p>
                     </div>
                 </section>
 
@@ -264,6 +267,49 @@
             </div>
         </main>
     </div>
+
+    <!-- Floating AI Weather Chatbot Window -->
+    <div class="ai-chat-window" id="ai-chat-window" hidden>
+        <div class="ai-chat-header">
+            <div class="chat-header-brand">
+                <i data-lucide="bot" class="ai-bot-icon"></i>
+                <div>
+                    <h4>Nimbus AI</h4>
+                    <span>Online & Ready</span>
+                </div>
+            </div>
+            <button id="close-ai-chat" class="btn-icon btn-chat-close" aria-label="Minimize AI panel">
+                <i data-lucide="minus"></i>
+            </button>
+        </div>
+        
+        <div class="ai-chat-body" id="ai-chat-body">
+            <!-- Messages render here -->
+            <div class="chat-bubble ai">
+                Hi! I am **Nimbus AI**, your personal weather assistant. Ask me anything about current conditions, outfit choices, outdoor activities, or air quality.
+            </div>
+        </div>
+        
+        <div class="ai-chat-suggestions" id="ai-chat-suggestions">
+            <button class="chat-suggest-btn">What should I wear?</button>
+            <button class="chat-suggest-btn">Outdoor workout check</button>
+            <button class="chat-suggest-btn">Explain air quality</button>
+        </div>
+        
+        <div class="ai-chat-input-area">
+            <input type="text" id="ai-chat-input" placeholder="Ask Nimbus AI about the weather..." autocomplete="off">
+            <button id="send-ai-message" class="btn-chat-send" aria-label="Send message">
+                <i data-lucide="send"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating AI Toggler Trigger Button -->
+    <button id="ai-chat-toggle" class="ai-chat-toggle-btn" title="Open Nimbus AI Weather Assistant">
+        <i data-lucide="bot" class="toggle-icon-default"></i>
+        <i data-lucide="x" class="toggle-icon-close" hidden></i>
+        <span class="ai-notification-badge">AI</span>
+    </button>
 
     <!-- Script -->
     <script src="app.js"></script>
